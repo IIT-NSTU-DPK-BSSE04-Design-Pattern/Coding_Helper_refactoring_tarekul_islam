@@ -72,12 +72,15 @@ public class BoxPlotUI {
     }
 }
 public class BoxAndWhiskerChart {
-    public static void main(String[] args) {
-        // Simulated data (replace with actual data retrieval logic)
-        List<double[]> similarArray = CosineSimilarity.similarArray;
-        List<String> fileNames = CloneCheck.ProjectFileName1;
+    private final List<double[]> similarArray;
+    private final List<String> fileNames;
 
-        // Data processing
+    public BoxAndWhiskerChart(List<double[]> similarArray, List<String> fileNames) {
+        this.similarArray = similarArray;
+        this.fileNames = fileNames;
+    }
+
+    public void generateAndDisplayChart() {
         BoxPlotDataProcessor dataProcessor = new BoxPlotDataProcessor();
         DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
 
@@ -86,7 +89,15 @@ public class BoxAndWhiskerChart {
             dataset.add(processedData, "First_Project vs Second_Project", fileNames.get(i));
         }
 
-        // Display UI
         EventQueue.invokeLater(() -> new BoxPlotUI(dataset).display());
+    }
+
+    public static void main(String[] args) {
+        // Replace with actual data retrieval
+        List<double[]> similarArray = CosineSimilarity.similarArray;
+        List<String> fileNames = CloneCheck.ProjectFileName1;
+
+        BoxAndWhiskerChart chart = new BoxAndWhiskerChart(similarArray, fileNames);
+        chart.generateAndDisplayChart();
     }
 }
