@@ -18,63 +18,75 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 
-public class BoxAndWhiskerChart {
-    ChartPanel chartPanel;
-
-    JScrollPane scrollPane;
-
-    private List<Double> getInputData(double l[]) {
-        ArrayList<Double> list = new ArrayList<>();
-        for (int j = 0; j < l.length; j++) {
-            double d = l[j];
-            //    System.out.println("k=="+l[j]);
-            list.add(l[j]);
-
-        }//System.out.println("");
+public class BoxPlotDataProcessor {
+    public List<Double> processInputData(double[] dataArray) {
+        List<Double> list = new ArrayList<>();
+        for (double value : dataArray) {
+            list.add(value);
+        }
         return list;
     }
-
-    public void display() {
-        JFrame f = new JFrame("Clone_Check");
-
-        f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        DefaultBoxAndWhiskerCategoryDataset boxData = new DefaultBoxAndWhiskerCategoryDataset();
-
-        for (int i = 0; i < CosineSimilarity.similarArray.size(); i++) {
-            // System.out.println("p="+CosineSimilarity.similarArray.g);
-            boxData.add(getInputData(CosineSimilarity.similarArray.get(i)), "First_Project vs Second_Project", CloneCheck.ProjectFileName1.get(i));
-        }
+}
+public class BoxPlotChartRenderer {
+    public JPanel createChart(DefaultBoxAndWhiskerCategoryDataset dataset) {
         BoxAndWhiskerRenderer renderer = new BoxAndWhiskerRenderer();
         renderer.setFillBox(true);
         renderer.setUseOutlinePaintForWhiskers(true);
-
         renderer.setMedianVisible(true);
         renderer.setMeanVisible(false);
 
         CategoryAxis xAxis = new CategoryAxis("First_Project_Files");
         NumberAxis yAxis = new NumberAxis("Second_Project_Values");
-        CategoryPlot plot = new CategoryPlot(boxData, xAxis, yAxis, renderer);
-        final JFreeChart chart = new JFreeChart(
+        CategoryPlot plot = new CategoryPlot(dataset, xAxis, yAxis, renderer);
+
+        JFreeChart chart = new JFreeChart(
                 "Box-and-Whisker Plot",
                 new Font("SansSerif", Font.BOLD, 20),
                 plot,
                 true
         );
-        final ChartPanel chartPanel = new ChartPanel(chart);
         chart.setBackgroundPaint(Color.LIGHT_GRAY);
-        //   JFreeChart chart = new JFreeChart("Test", JFreeChart.DEFAULT_TITLE_FONT, plot, true);
-        f.add(new ChartPanel(chart) {
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(600, 600);
-            }
-        });
-        f.pack();
-        f.setLocationRelativeTo(null);
-        f.setVisible(true);
+
+        return new ChartPanel(chart);
+    }
+}
+public class BoxPlotUI {
+    private final DefaultBoxAndWhiskerCategoryDataset dataset;
+
+    public BoxPlotUI(DefaultBoxAndWhiskerCategoryDataset dataset) {
+        this.dataset = dataset;
     }
 
-    public static void BoxWhisker() {
-        EventQueue.invokeLater(new BoxAndWhiskerChart()::display);
+    public void display() {
+        JFrame frame = new JFrame("Clone_Check");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        BoxPlotChartRenderer renderer = new BoxPlotChartRenderer();
+        JPanel chartPanel = renderer.createChart(dataset);
+
+        chartPanel.setPreferredSize(new Dimension(600, 600));
+        frame.add(chartPanel);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+}
+public class BoxAndWhiskerChart {
+    public static void main(String[] args) {
+        // Simulated data (replace with actual data retrieval logic)
+        List<double[]> similarArray = CosineSimilarity.similarArray;
+        List<String> fileNames = CloneCheck.ProjectFileName1;
+
+        // Data processing
+        BoxPlotDataProcessor dataProcessor = new BoxPlotDataProcessor();
+        DefaultBoxAndWhiskerCategoryDataset dataset = new DefaultBoxAndWhiskerCategoryDataset();
+
+        for (int i = 0; i < similarArray.size(); i++) {
+            List<Double> processedData = dataProcessor.processInputData(similarArray.get(i));
+            dataset.add(processedData, "First_Project vs Second_Project", fileNames.get(i));
+        }
+
+        // Display UI
+        EventQueue.invokeLater(() -> new BoxPlotUI(dataset).display());
     }
 }
